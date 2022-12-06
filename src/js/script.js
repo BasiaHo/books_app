@@ -15,6 +15,7 @@
     books: {
       list: '.books-list',
       bookImage: 'a.book__image',
+      bookById: (id) => `.book__image[data-id="${id}"]`,
     },
   };
 
@@ -26,6 +27,7 @@
 
   function renderBooksList() {
     for (let book of dataSource.books) {
+      console.log(book);
       const generatedHTML = templates.bookTemplate(book);
       const domElement = utils.createDOMFromHTML(generatedHTML);
       const booksList = document.querySelector(select.books.list);
@@ -37,7 +39,7 @@
 
   let favoritesBooks = [];
 
-  function addToFavorites(event) {
+  function handleFavorites(event) {
     if (event.target.offsetParent.classList.contains('book__image')) {
       const clickedBook = event.target.offsetParent;
       event.preventDefault();
@@ -54,12 +56,48 @@
     }
   }
 
-  function initAction() {
-    const booksList = document.querySelector(select.books.list);
-    booksList.addEventListener('dblclick', addToFavorites);
+  let filters = [];
+
+  function handleFilters(event) {
+    if (event.target.checked) {
+      filters.push(event.target.value);
+    } else {
+      const filterIndex = filters.indexOf(event.target.value);
+      filters.splice(filterIndex, 1);
+    }
+
+    filterBooks();
   }
 
-  let filters = [];
+  function filterBooks() {
+    for (const book of dataSource.books) {
+      let shouldBeHidden = false;
+
+      for (const filter of filters) {
+        if (!book.details[filter]) {
+          shouldBeHidden = true;
+        }
+      }
+
+      const bookElem = document.querySelector(select.books.bookById(book.id));
+
+      if (shouldBeHidden) {
+        bookElem.classList.add('hidden');
+      } else {
+        bookElem.classList.remove('hidden');
+      }
+    }
+  }
+
+  function initAction() {
+    const booksList = document.querySelector(select.books.list);
+    booksList.addEventListener('dblclick', handleFavorites);
+
+    const filtersForm = document.querySelector(select.containerOf.filtersForm);
+    filtersForm.addEventListener('click', handleFilters);
+
+    filterBooks();
+  }
 
   initAction();
 }
