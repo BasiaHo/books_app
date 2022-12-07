@@ -124,7 +124,6 @@
 
         for (const filter of thisBooksList.filters) {
           if (!book.details[filter]) {
-            
             shouldBeHidden = true;
           }
         }
@@ -157,5 +156,5 @@
   }
 
   const booksListElem = document.querySelector(select.books.list);
-  const app = new BooksList(booksListElem);
+  new BooksList(booksListElem);
 }
